@@ -1,0 +1,7 @@
+1 Pampers 20 2
+69 PewDiePieGamingChair 399 25
+6 InfinityStones 1 6
+15 NescafeGold 20 2
+70 EnergyBulb 100 1
+911 TwinTowers 4000000 4000000000
+0 MyLife 0 0
