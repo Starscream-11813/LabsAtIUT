@@ -1,0 +1,23 @@
+Imamul Ahsan Radit
+144433
+02 12 1995
+CSE
+3.62
+
+Al-Shahriar Rubel
+144434
+14 7 1995
+CSE
+3.67
+
+Sabbir Ahmed Sristy
+144436
+22 05 1995
+CSE
+3.34
+
+Abid Hasan
+143422
+12 11 1995
+EEE
+3.92
