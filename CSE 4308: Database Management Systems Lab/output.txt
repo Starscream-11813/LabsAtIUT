@@ -1,0 +1,5 @@
+Total Number of Accounts: 162
+CIP count: 4
+VIP count: 2
+Ordinary count: 50
+Uncategorized: 106
