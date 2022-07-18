@@ -1,0 +1,89 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{tgpagella}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{diffcoeff,amssymb}
+\usepackage{hyperref}
+\usepackage{sectsty}
+\sectionfont{\fontsize{19}{15}\selectfont}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdftitle={Overleaf Example},
+    pdfpagemode=FullScreen,
+    }
+\title{Cauchy-Riemann Equations}
+
+\begin{document}
+
+\section*{Cauchy-Riemann Equations}
+Let
+\begin{equation} \label{eq:1}
+f(x, y) \equiv u(x, y) + \mathnormal{i} v(x,y),   
+\end{equation}\\
+where
+\begin{equation} \label{eq:2}
+z \equiv x+\mathnormal{i}y
+\end{equation}\\
+so
+\begin{equation} \label{eq:3}
+dz = dx + \mathnormal{i}dy.
+\end{equation}\\
+The total derivative of $f$ with respect to $z$ is then
+\begin{align}
+   \diff{f}z &= \diffp{f}x \diffp{x}z + \diffp{f}y \diffp{y}z \label{eq:4}\\
+&= \frac{1}{2}\left(\diffp{f}x-i\diffp{f}y\right). \label{eq:5}
+\end{align}
+In terms of $u$ and $v$, \eqref{eq:5} becomes
+\begin{align}
+\diff{f}z &= \frac{1}{2}\left[\left(\diffp{u}x+i\diffp{v}x\right)-i\left(\diffp{u}y+i\diffp{v}y\right)\right] \label{eq:6}\\
+&= \frac{1}{2}\left[\left(\diffp{u}x+i\diffp{v}x\right)+i\left(-i\diffp{u}y+\diffp{v}y\right)\right]. \label{eq:7}
+\end{align}
+Along the real, or \href{https://mathworld.wolfram.com/x-Axis.html}{x-axis}, $\partial f / \partial y = 0$, so
+\begin{equation} \label{eq:8}
+\diff{f}z = \frac{1}{2}\left(\diffp{u}x + i\diffp{v}x\right).
+\end{equation}
+\\
+Along the imaginary, or \href{https://mathworld.wolfram.com/y-Axis.html}{y-axis}, $\partial f / \partial x = 0$, so
+\begin{equation} \label{eq:9}
+\diff {f}z = \frac{1}{2}\left(-i\diffp{u}y + \diffp{v}y\right).
+\end{equation}
+If $f$ is \href{https://mathworld.wolfram.com/ComplexDifferentiable.html}{complex differentiable}, then the value of the derivative must be the same for a given $dz$, regardless of its orientation. Therefore, \eqref{eq:8} must equal \eqref{eq:9}, which requires that
+\begin{equation} \label{eq:10}
+    \diffp{u}x = \diffp{v}y
+\end{equation}
+and
+\begin{equation} \label{eq:11}
+    \diffp{v}x = -\diffp{u}y.
+\end{equation}
+These are known as the Cauchy-Riemann equations.\\ \\
+They lead to the conditions
+\begin{align}
+    \diffp[2]{u}x &= -\diffp[2]{u}y \label{eq:12}\\
+    \diffp[2]{v}x &= -\diffp[2]{v}y \label{eq:13}
+\end{align}
+The Cauchy-Riemann equations may be concisely written as
+\begin{align}
+\diff{f}{\bar{z}} &= \frac{1}{2}\left[\diffp{f}x + i\diffp{f}y\right] \label{eq:14}\\
+&= \frac{1}{2}\left[\left(\diffp{u}x + i\diffp{v}x\right)+i\left(\diffp{u}y + i\diffp{v}y\right)\right] \label{eq:15}\\
+&= \frac{1}{2}\left[\left(\diffp{u}x - \diffp{v}y\right)+i\left(\diffp{u}y + \diffp{v}x\right)\right] \label{eq:16}\\
+&= 0,\label{eq:17}
+\end{align}
+where $\bar{z}$ is the \href{https://mathworld.wolfram.com/ComplexConjugate.html}{complex conjugate}.\\ \\
+If $z = re^{i\theta}$, then the Cauchy-Riemann equations become
+\begin{align}
+    \diffp{u}r &= \frac{1}{r}\diffp{v}{\theta} \label{eq:18}\\
+    \frac{1}{r}\diffp{u}{\theta} &= -\diffp{v}r \label{eq:19}
+\end{align}
+(Abramowitz and Stegun 1972, p. 17).\\ \\
+If $u$ and $v$ satisfy the Cauchy-Riemann equations, they also satisfy \href{https://mathworld.wolfram.com/LaplacesEquation.html}{Laplace's equation} in two dimensions, since
+\begin{align}
+    \diffp[2]{u}x + \diffp[2]{u}y &= \diffp{}{x}\left(\diffp{v}y\right)+\diffp{}{y}\left(-\diffp{v}x\right)=0 \label{eq:20}\\
+    \diffp[2]{v}x + \diffp[2]{v}y &= \diffp{}{x}\left(-\diffp{u}y\right)+\diffp{}{y}\left(\diffp{u}x\right)=0 \label{eq:21}
+\end{align}
+By picking an arbitrary $f(z)$, solutions can be found which automatically satisfy the Cauchy-Riemann equations and \href{https://mathworld.wolfram.com/LaplacesEquation.html}{Laplace's equation}. This fact is used to use \href{https://mathworld.wolfram.com/ConformalMapping.html}{conformal mappings} to find solutions to physical problems involving scalar potentials such as fluid flow and electrostatics.
+
+\end{document}

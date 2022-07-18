@@ -1,0 +1,38 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{tgpagella}
+
+\usepackage{hyperref}
+\hypersetup{
+colorlinks = true,
+citecolor=blue,
+urlcolor=blue
+}
+\title{\textbf{MobileNetV2: Inverted Residuals and Linear Bottlenecks}}
+\author{Mark Sandler \hspace{0.7in} Andrew Howard \hspace{0.7in} Menglong Zhu}
+\begin{document}
+\maketitle
+\section{Abstract}
+\textit{Finally, our approach allows decoupling of the in-
+put/output domains from the expressiveness of the trans-
+formation, which provides a convenient framework for
+further analysis. We measure our performance on
+ImageNet \cite{DBLP:journals/corr/RussakovskyDSKSMHKKBBF14} classification, COCO object detection \cite{DBLP:journals/corr/LinMBHPRDZ14} VOC image segmentation \cite{Everingham2014ThePV}.}
+
+\section{Introduction}
+Features are subsequently projected back to a
+low-dimensional representation with a linear convolu-
+tion. The official implementation is available as part of
+TensorFlow-Slim model library in \cite{tensorflowmodels}.
+
+\section{Related Work}
+Both manual architecture search and improvements in
+training algorithms, carried out by numerous teams has
+lead to dramatic improvements over early designs such
+as AlexNet \cite{NIPS2012_c399862d}, VGGNet \cite{simonyan2014very}, GoogLeNet \cite{DBLP:journals/corr/SzegedyLJSRAEVR14}. , and
+ResNet \cite{DBLP:journals/corr/HeZRS15}. Recently there has been lots of progress in algorithmic architecture exploration included hyper-
+parameter optimization \cite{10.5555/2188385.2188395,snoek2012practical} as well as various methods of network pruning and
+connectivity learning.
+\bibliographystyle{ieeetr}
+\bibliography{ref}
+\end{document}

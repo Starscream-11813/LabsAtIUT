@@ -1,0 +1,394 @@
+%%%% ijcai22-multiauthor.tex
+
+\typeout{IJCAI--22 Multiple authors example}
+
+% These are the instructions for authors for IJCAI-22.
+
+\documentclass{article}
+\pdfpagewidth=8.5in
+\pdfpageheight=11in
+% The file ijcai22.sty is NOT the same as previous years'
+\usepackage{ijcai22}
+
+% Use the postscript times font!
+\usepackage{times}
+\renewcommand*\ttdefault{txtt}
+\usepackage{soul}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[small]{caption}
+\usepackage{graphicx}
+\usepackage{amsfonts} 
+\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{babel}
+\usepackage{multirow}
+\usepackage{booktabs}
+\graphicspath{{Images/}}
+\urlstyle{same}
+
+% the following package is optional:
+%\usepackage{latexsym}
+
+% Following comment is from ijcai97-submit.tex:
+% The preparation of these files was supported by Schlumberger Palo Alto
+% Research, AT\&T Bell Laboratories, and Morgan Kaufmann Publishers.
+% Shirley Jowell, of Morgan Kaufmann Publishers, and Peter F.
+% Patel-Schneider, of AT\&T Bell Laboratories collaborated on their
+% preparation.
+
+% These instructions can be modified and used in other conferences as long
+% as credit to the authors and supporting agencies is retained, this notice
+% is not changed, and further modification or reuse is not restricted.
+% Neither Shirley Jowell nor Peter F. Patel-Schneider can be listed as
+% contacts for providing assistance without their prior permission.
+
+% To use for other conferences, change references to files and the
+% conference appropriate and use other authors, contacts, publishers, and
+% organizations.
+% Also change the deadline and address for returning papers and the length and
+% page charge instructions.
+% Put where the files are available in the appropriate places.
+
+%PDF Info Is REQUIRED.
+% Please **do not** include Title and Author information
+\pdfinfo{
+/TemplateVersion (IJCAI.2022.0)
+}
+
+
+\title{Location Predicts You:\\
+Location Prediction via Bi-direction Speculation and Dual-level Association}
+
+\author{
+Xixi Li$^1$\and
+Ruimin Hu$^2$\footnote{Contact Author} \and
+Zheng Wang$^{2,3}$\And
+Toshihiko Yamasaki$^{2,3}$\\
+\affiliations
+$^1$National Engineering Research Center for Multimedia Software (NERCMS),\\ School of Computer Science, Wuhan University\\
+$^2$Research Institute for an Inclusive Society through Engineering (RIISE), The University of Tokyo\\
+$^3$Department of Information and Communication Engineering, The University of Tokyo\\
+\emails
+\{xixil, hrm\}@whu.edu.cn,
+wangzwhu@gmail.com,
+yamasaki@cvm.t.u-tokyo.ac.jp
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Location prediction is of great importance in location-based applications for the construction of 
+the smart city. To our knowledge, existing mod-
+els for location prediction focus on users’ prefer-
+ences on POIs from the perspective of the human
+side. However, modeling users’ interests from the
+historical trajectory is still limited by the data spar-
+sity. Additionally, most of existing methods predict
+the next location according to the individual data
+independently, but the data sparsity makes it dif-
+ficult to mine explicit mobility patterns or capture
+the casual behavior for each user. To address the is-
+sues above, we propose a novel Bi-direction Specu-
+lation and Dual-level Association method (BSDA),
+which considers both users’ interests in POIs and
+POIs’ appeal to users. Furthermore, we develop the
+cross-user and cross-POI association to alleviate
+the data sparsity by similar users and POIs to enrich
+the candidates. Experimental results on two public
+datasets demonstrate that BSDA achieves signifi-
+cant improvements over state-of-the-art methods.
+\end{abstract}
+
+\section{Introduction}
+
+Human mobility modeling on spatiotemporal data has gained
+significant research interests due to its importance for hu-
+man behavior understanding and applications for the con-
+struction of smart city \cite{yu2019adaptive,wang2019beyond,wang2021very}. One of the most important applica-
+tions is the next location prediction, which aims to predict
+the next Point-of-Interest (POI) someone tends to visit based
+on his/her historical trajectory data.
+In recent years, plenty of research efforts have been made
+on the location prediction [Yang et al., 2020], including Ma-
+trix Factorization based [Ren et al., 2017], Markov Chain
+(MC) based [Zhang et al., 2014a; Chen et al., 2014] and neu-
+ral network based methods [Karatzoglou et al., 2018]. To
+our knowledge, these methods only investigated how the user
+chooses places, i.e., focusing on the users’ preferences on
+POIs from the perspective of the human side. Unfortunately, despite the success of these works for enriching the repre-
+sentation, modeling users’ interests from the human trajec-
+tory history is still limited by the data sparsity due to the fact
+that most users share few records online. In addition, most
+of methods predicted someone’s next location according to
+his/her own trajectory independently. But the data sparsity
+makes it difficult to mine explicit mobility patterns for each
+user or to capture the casual behavior of the user. Hence, the
+next location prediction is still a challenging task.
+To address the issues above, in this paper, we propose a
+novel Bi-direction Speculation and Dual-level Association
+method (BSDA). The characteristics of our method are re-
+flected in the following aspects: 1) From the Perspective
+of the Location Side: we consider that the POI appeals or
+chooses the users autonomously. If we set a POI as the
+subject, another model should be capable of predicting the
+next user who will visit this POI, according to the histori-
+cal data of this POI. 2) Cross-User Association: we believe
+that some users have similar interests and they may visit the
+same places. When we can not predict one’s next location ac-
+curately due to his incomplete historical trajectory data, the
+POI candidate of users who are similar to him might be his
+choice. 3) Cross-POI Association: it is also reasonable that
+similar places appeal to common users. Hence, the most sim-
+ilar POIs also benefit the prediction of next coming users.
+
+\subsection{Motivation}
+We conduct some preliminary statistic analysis on the
+Gowalla dataset [Cho et al., 2011] to demonstrate our mo-
+tivations described above.
+Firstly, we investigate how the POI appeals or chooses the
+visiting users. We count the visiting times of the users for
+several randomly selected POIs. Figure 1(a) shows the re-
+sults of 15 POIs. The horizontal axis stands for the thresh-
+old of the visiting times of each user, while the vertical axis
+denotes the number of users visiting the corresponding POI.
+The figure demonstrates that for a certain POI, some users
+visit frequently while the others visit occasionally, and only a
+few users visit 3-8 times. Here is an example to illustrate this
+phenomenon. A library appeals to people who like reading
+but does not attract those who don’t have relevant habits. We
+also explore temporal patterns in POIs’ behavior by calculat-
+ing the densities of visitors at different time slots in a day and
+on different days in a week. Figure 1(b) shows the statistic re-
+
+\begin{figure*}[h]
+    \centering
+    \subfloat[User Visiting Times]{\includegraphics[scale=0.6]{images/fig1a.PNG}}\hspace{0.1cm}\subfloat[POI’s Temporal Pattern]{\includegraphics[scale=0.6]{images/fig1b.PNG}}\hspace{0.1cm}\subfloat[User-sim \textit{vs.} \#Comm. POI]
+    {\includegraphics[scale=0.6]{images/fig1c.PNG}}
+    \hspace{0.1cm}\subfloat[POI-sim \textit{vs.} \#Comm. User]{\includegraphics[scale=0.6]{images/fig1d.PNG}}\hspace{0.1cm}
+    \caption{The statistical data to show the motivation of our method.}
+    \label{fig:fig1}
+\end{figure*}
+
+sults of randomly selected 35 POIs. The figure demonstrates
+that POIs have different temporal patterns as their distinct dif-
+ference in densities on the two time scales. It is easy to un-
+derstand that an amusement park often has more visitors at
+weekends than on weekdays, while an office building always
+has an opposite pattern. Additionally, a bar is usually busy
+at night, while a museum only accommodates visitors in the
+morning. These findings show that POI has its behavior pat-
+terns to appeal to a certain kind of users. Intuitively, it is rea-
+sonable that the task can be considered from the perspective
+of the location side.
+Secondly, we intend to validate that similar users may visit
+the same places. We judge the similarity of each pair of users
+according to whether they visit the same place on the same
+day. The more common places they visit, the more similar
+the users’ visiting patterns are. We also count the number of
+common POIs of each pair of users. Figure 1(c) shows the
+results of user similarity vs. \#common POI. Figure 1(c) eas-
+ily demonstrates that the user similarity and the number of
+common POIs are proportional to each other (highly related).
+Hence, the next POIs of one’s most similar users can be con-
+sidered as the choice, on condition that we can not predict
+his/her next POI accurately due to the incomplete historical
+trajectory data.
+Thirdly, we evaluate whether similar places may appeal to
+common users. We judge the similarity of each pair of POIs
+according to whether they appeal to the common users on the
+same day. The more common visitors they have, the more
+similar their behavior patterns are. We also count the number
+of common users of each pair of POIs. Figure 1(d) shows
+the results of POI similarity vs. \#common user. Figure 1(d)
+easily demonstrates that the POI similarity and the number of
+common users are proportional to each other (highly related).
+Hence, the next visitors of similar POIs can be considered as
+the choice of the focused POI.
+To this end, we propose a novel Bi-direction Speculation
+and Dual-level Association method (BSDA) for the next lo-
+cation prediction by mining both users’ interests in POIs and
+POIs’ appeal to users. From the point of the human side,
+we pay attention to when and where the user is likely to go.
+While from the point of the location side, we focus on when
+and who will visit this place. Specifically, we first develop
+two networks to explore users’ interests and POIs’ appeal
+separately. In addition, we exploit the cross-user and cross-
+POI association to alleviate the data sparsity by mining simi-
+lar users and POIs to enrich the candidates. In particular, we
+learn the POI similarity and user similarity matrices through
+the historical trajectory data and fuse them with the outputs of
+two networks to predict the next location of all related users.
+We verify the effectiveness of our proposed model on two
+public check-in datasets and experimental results show that
+BSDA outperforms state-of-the-art methods for the location
+prediction task.
+The contributions of our paper are summarized as follows:
+
+1) We first investigate the phenomena of POIs’ behavior pat-
+terns about appeal to users, user similarity and POI similarity.
+2) We propose a novel Bi-direction Speculation and Dual-
+level Association method (BSDA) for location prediction by
+mining both users’ interests and POIs’ appeal, as well as fus-
+ing with cross-user and cross-POI association. 3) Evaluations
+on two public real-world datasets show that BSDA achieves
+significant improvements over the state-of-the-art methods.
+
+\section{Related Work}
+Current methods on location prediction can be mainly cate-
+gorized into three groups: Matrix Factorization (MF) based,
+Markov Chain (MC) based, and RNN based. MF-based meth-
+ods [Koren et al., 2009; Liu et al., 2013] are good at cap-
+turing users’ general preferences but cannot mine users’ se-
+quential patterns. MC-based methods [Zhang et al., 2014a;
+Chen et al., 2014; He and McAuley, 2016] are capable of cap-
+turing the sequential transitions but the first-order MCs fail
+to learn the long-term preference. By combining the power
+of MF and MC, [Rendle et al., 2010] proposed a factorizing
+personalized MCs to obtain both long-term preference and
+short-term transitions. [Wang et al., 2015] made an exten-
+sion with global user vectors to learn users’ hierarchical rep-
+resentation. [Feng et al., 2015] also proposed a personalized
+ranking metric embedding for personalized recommendation
+by integrating sequential information, individual preference
+and geographical influence. However, these methods mainly
+focus on modeling the user-POI interaction or the transitions
+between successive POIs to mine users’ preferences, limited
+by the data sparsity since most users share few records online.
+RNN [Zhang et al., 2014b] and its variants LSTM [Hochre-
+iter and Schmidhuber, 1997] and GRU [Cho et al., 2011],
+have shown great advantages in sequential modeling task. For
+instance, [Yao et al., 2017] learned temporal regularity, ac-
+
+\begin{figure*}
+    \centering
+    \includegraphics[scale=0.66]{images/fig2.PNG}
+    \caption{The framework of our Bi-direction Speculation and Dual-level Association method (BSDA). It consists of the User-Net and the POI-Net to speculate the next POI where a user will go or the next user who will visit the POI, respectively. It also contains the cross-user and cross-POI association parts to adjust the results. Finally, bi-direction speculations are fused for the location prediction.}
+    \label{fig:fig2}
+\end{figure*}
+
+tivity semantics, and user preference by embedding sequen-
+tial context and temporal information together into LSTM.
+[Sun et al., 2020] incorporated both long- and short-term
+preferences and considered geographical relations between
+two nonconsecutive POIs. Other deep models such as mem-
+ory network and attention mechanism [Vaswani et al., 2017]
+were also widely employed [Ying et al., 2018]. [Huang et al.,
+2018] proposed to discriminate the significance of individual
+user behaviors using the feature-wise masked self-attention.
+[Feng et al., 2017]
+POIs as subjects to do the bi-direction speculation. Further-
+more, three points about our dual-level association need to be
+emphasized. 1) Our proposed association is to adjust the POI
+or user candidate list, which occurs after training while shar-
+ing parameters or using embedding is during training. 2) In
+POI-net and User-net, our proposed similarities is to provide
+more possible candidates based on patterns, not just shared
+data. 3) Our dual-level association is time-aware, i.e., the
+output candidate list is dynamically adjusted according to the
+similar behavior at a given time.
+To sum up, our method has the following advantages. To
+our best knowledge, it is the first time that the location pre-
+diction problem is considered from both the perspective of the
+human side and the location side. We propose the bi-direction
+speculation, i.e., mining both users’ interests in POIs and
+POIs’ appeal to users. Moreover, we exploit the cross-user and cross-POI association to alleviate the data sparsity by
+mining similar users and POIs to enrich the candidates.
+
+\section{Proposed Methodology}
+\subsection{Problem Formulation}
+\subsection{Framework Overview}
+\subsection{User-Net and Cross-User Association}
+The User-Net is designed for exploring users’ interests in
+POIs by modeling users’ spatiotemporal behavior patterns,
+which belongs to the traditional location prediction task. Its
+input is the trajectory history of users and the output is the
+POI candidate score list. Motivated by the success of Flash-
+back [Yang et al., 2020], our User-Net uses RNNs to cap-
+ture the sequential patterns and compute the weighted aver-
+age of the historical hidden states as the aggregated output $h_{\omega_t}$ with a decay weight $\omega(\Delta T, \Delta D)$ to predict the next lo-
+cation. The decay weight is designed to measure the predic-
+tive power of the hidden state $h_j$ to the current one $h_t, j < t: \omega(\Delta T_{i,j}, \Delta D_{i,j}) = \textnormal{hvc}(2\pi\Delta T_{i,j})e^{-\alpha\Delta T_{i,j}}e^{-\beta\Delta D_{i,j}}$, where $\Delta T$ denotes the temporal interval, $\Delta D$ denotes the ge-
+ographical distance. The Havercosine term $\textnormal{hvc}$(·) is to capture the periodicity of user behavior. The exponential terms
+are to capture the impact of historical check-ins.
+
+Therefore, we multiply the POI candi-
+date score matrix $\textbf{S}_U$ with the user similarity matrix $\textit{\textbf{Corr}}_U$ to get the adjusted score matrix $\hat{\textbf{S}}_U$:
+\begin{equation} \label{eq:1}
+    \hat{\textbf{S}}_U = \textit{\textbf{Corr}}_U * \textbf{S}_U
+\end{equation}
+where $\hat{\textbf{S}}_U \in \mathbb{R}^{M \times N}$. Finally, for a user $u$, we can get the adjusted POI candidate score list $\hat{\textbf{s}}^u_U$
+from $\hat{\textbf{S}}_U$. For each user, we first split the historical trajectory $\mathcal{R}_u$ into sub-sequences as the input of the RNN units. At each
+step $t$, the hidden state is denoted as $h_t$. Then we leverage the spatiotemporal contexts to generate the decay weight $\omega(\Delta T, \Delta D)$ for calculating the aggregated output $h_{\omega_t}  = \frac{\sum_{j=0}^{t}\omega_j*h_j}{\sum_{j=0}^{t}\omega_j}$.
+
+Meanwhile, we generate a user candidate score matrix $\textbf{S}_L$ which
+consists of the user candidate score list of each POI in set $\mathcal{L}$, \textit{i.e.} $\textbf{S}_L = [\textbf{s}_L^{l_1};\textbf{s}_L^{l_1};\hdots;\textbf{s}_L^{l_N};]$, $\textbf{S}_L \in \mathbb{R}^{N \times M}$, $\textbf{s}_L^{l}$ denotes the
+user candidate score list of POI $l$ at time $t_{\tau'}, l \in \mathcal{L}$.
+Therefore, we multiply the POI candi-
+date score matrix $\textbf{S}_L$ with the user similarity matrix $\textit{\textbf{Corr}}_L$ to get the adjusted score matrix $\hat{\textbf{S}}_L$:
+\begin{equation} \label{eq:2}
+    \hat{\textbf{S}}_L = \textit{\textbf{Corr}}_L * \textbf{S}_L
+\end{equation}
+\subsection{POI-Net and Cross-POI Association}
+Based on the observations on the POIs in Figure 1(a) and
+Figure 1(b), we derive the assumption that a POI can appeal
+or choose the users autonomously and there exist patterns in
+POIs’ behavior. Hence, we intend to explore POIs’ appeals
+and predict the next user who will visit the POI. From the per-
+spective of the location side, we assume that POIs’ appeals
+are dynamically changed over time. Therefore, we exploit
+POIs’ dynamic appeals by using RNNs to capture temporal
+patterns considering different time slots in a day and different
+days in a week.
+Given the historical data, we first represent POIs’ records
+in form of user sequences. For each POI l, we denote its
+
+
+\begin{table*}[]
+\begin{tabular}{c|cccc|cccc}
+\hline
+\multirow{2}{*}{Methods} & \multicolumn{4}{c|}{Gowalla} & \multicolumn{4}{c}{Foursquare}\\ \cline{2-9} & \multicolumn{1}{l}{Acc @ 1} & \multicolumn{1}{l}{Acc @ 5} & \multicolumn{1}{l}{Acc @ 10} & \multicolumn{1}{l|}{MRR} & \multicolumn{1}{l}{Acc @ 1} & \multicolumn{1}{l}{Acc @ 5} & \multicolumn{1}{l}{Acc @ 10} & \multicolumn{1}{l}{MRR} \\
+\hline
+BSDA w/o Cross-POI Association  & 0.1279 & 0.3287 & 0.3994 & 0.2212 & 0.2602 & 0.5842 & 0.6814 & 0.4207\\
+BSDA w/o Cross-User Association & 0.1279  & 0.3287 & 0.3994 & 0.2212  & 0.2602 & 0.5842 & 0.6814 & 0.4207 \\
+BSDA w/o user prediction  & 0.1279 & 0.3287  & 0.3994 & 0.2212  & 0.2602 & 0.5842 & 0.6814  & 0.4207 \\ 
+\hline
+BSDA & \textbf{0.1454} & \textbf{0.3531} & \textbf{0.4192}  & \textbf{0.2413}  & \textbf{0.3068} & \textbf{0.6612} & \textbf{0.7136}  & \textbf{0.4505}                 
+\end{tabular}
+\caption{Results of variants on two datasets (evaluated by Acc@1, Acc@5, Acc@10, and MRR)}
+\label{tab:table2}
+\end{table*}
+\section{Author names}
+
+Each author name must be followed by:
+\begin{itemize}
+    \item A newline {\tt \textbackslash{}\textbackslash{}} command for the last author.
+    \item An {\tt \textbackslash{}And} command for the second to last author.
+    \item An {\tt \textbackslash{}and} command for the other authors.
+\end{itemize}
+
+\section{Affiliations}
+
+After all authors, start the affiliations section by using the {\tt \textbackslash{}affiliations} command.
+Each affiliation must be terminated by a newline {\tt \textbackslash{}\textbackslash{}} command. Make sure that you include the newline on the last affiliation too.
+
+\section{Mapping authors to affiliations}
+
+If some scenarios, the affiliation of each author is clear without any further indication (\emph{e.g.}, all authors share the same affiliation, all authors have a single and different affiliation). In these situations you don't need to do anything special.
+
+In more complex scenarios you will have to clearly indicate the affiliation(s) for each author. This is done by using numeric math superscripts {\tt \$\{\^{}$i,j, \ldots$\}\$}. You must use numbers, not symbols, because those are reserved for footnotes in this section (should you need them). Check the authors definition in this example for reference.
+
+\section{Emails}
+
+This section is optional, and can be omitted entirely if you prefer. If you want to include e-mails, you should either include all authors' e-mails or just the contact author(s)' ones.
+
+Start the e-mails section with the {\tt \textbackslash{}emails} command. After that, write all emails you want to include separated by a comma and a space, following the same order used for the authors (\emph{i.e.}, the first e-mail should correspond to the first author, the second e-mail to the second author and so on).
+
+You may ``contract" consecutive e-mails on the same domain as shown in this example (write the users' part within curly brackets, followed by the domain name). Only e-mails of the exact same domain may be contracted. For instance, you cannot contract ``person@example.com" and ``other@test.example.com" because the domains are different.
+\bibliographystyle{named}
+\bibliography{ijcai22}
+\end{document}
+
