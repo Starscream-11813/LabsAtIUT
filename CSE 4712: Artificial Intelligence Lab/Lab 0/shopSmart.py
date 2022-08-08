@@ -36,8 +36,8 @@ def shopSmart(orderList, fruitShops):
     	price = fruitShops[shopIdx].getPriceOfOrder(orderList)
     	# minPrice = min(minPrice, price)
     	if(price < minPrice):
-    		minPrice = price	
-    		ret_shop = fruitShops[shopIdx]
+    	    minPrice = price	
+    	    ret_shop = fruitShops[shopIdx]
     return ret_shop
 
 
