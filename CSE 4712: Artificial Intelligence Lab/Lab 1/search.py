@@ -82,6 +82,53 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+# def depthFirstSearch(problem):
+#     """
+#     Search the deepest nodes in the search tree first.
+
+#     Your search algorithm needs to return a list of actions that reaches the
+#     goal. Make sure to implement a graph search algorithm.
+
+#     To get started, you might want to try some of these simple commands to
+#     understand the search problem that is being passed in:
+
+#     print("Start:", problem.getStartState())
+#     print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
+#     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
+#     """
+#     "*** YOUR CODE HERE ***"
+#     visited = set()
+#     start_node = problem.getStartState()
+#     unvisited = util.Stack()
+#     unvisited.push((start_node, []))
+#     while unvisited.isEmpty() == False:
+#     	(current_state, path) = unvisited.pop()
+#     	if problem.isGoalState(current_state) == True:
+#     		return path
+#     	elif current_state not in visited:
+#     		visited.add(current_state)
+#     		for (child, action, cost) in problem.getSuccessors(current_state):
+#     			if child not in visited:
+#     				unvisited.push((child, path + [action]))
+#     #util.raiseNotDefined()
+
+# def breadthFirstSearch(problem):
+#     """Search the shallowest nodes in the search tree first."""
+#     "*** YOUR CODE HERE ***"
+#     visited = set()
+#     start_node = problem.getStartState()
+#     unvisited = util.Queue()
+#     unvisited.push((start_node, []))
+#     while unvisited.isEmpty() == False:
+#     	(current_state, path) = unvisited.pop()
+#     	if problem.isGoalState(current_state) == True:
+#     		return path
+#     	elif current_state not in visited:
+#     		visited.add(current_state)
+#     		for (child, action, cost) in problem.getSuccessors(current_state):
+#     			if child not in visited:
+#     				unvisited.push((child, path + [action]))
+#     #util.raiseNotDefined()
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -97,38 +144,53 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    visited = set()
     start_node = problem.getStartState()
-    unvisited = util.Stack()
-    unvisited.push((start_node, []))
+    # unvisited = util.Stack()
+    unvisited = util.PriorityQueue()
+    priority = 0
+    visited = set() # amortized O(1) look-up
+    # unvisited.push((start_node, []))
+    unvisited.push((start_node, [], 0), priority)
+    priority -= 1
     while unvisited.isEmpty() == False:
-    	(current_state, path) = unvisited.pop()
-    	if problem.isGoalState(current_state) == True:
-    		return path
-    	elif current_state not in visited:
-    		visited.add(current_state)
-    		for (child, action, cost) in problem.getSuccessors(current_state):
-    			if child not in visited:
-    				unvisited.push((child, path + [action]))
+        # (current_state, path) = unvisited.pop()
+        (current_state, path, _) = unvisited.pop()
+        priority += 1
+        if problem.isGoalState(current_state) == True:
+            return path
+        elif current_state not in visited:
+            visited.add(current_state)
+            for (child, action, cost) in problem.getSuccessors(current_state):
+                if child not in visited:
+                    # unvisited.push((child, path + [action]))
+                    unvisited.push((child, path + [action], 0), priority)
+                    priority -= 1
     #util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    visited = set()
     start_node = problem.getStartState()
-    unvisited = util.Queue()
-    unvisited.push((start_node, []))
+    # unvisited = util.Queue()
+    unvisited = util.PriorityQueue()
+    priority = 0
+    visited = set() # amortized O(1) look-up
+    # unvisited.push((start_node, []))
+    unvisited.push((start_node, [], 1), priority)
+    priority += 1
     while unvisited.isEmpty() == False:
-    	(current_state, path) = unvisited.pop()
-    	if problem.isGoalState(current_state) == True:
-    		return path
-    	elif current_state not in visited:
-    		visited.add(current_state)
-    		for (child, action, cost) in problem.getSuccessors(current_state):
-    			if child not in visited:
-    				unvisited.push((child, path + [action]))
-    #util.raiseNotDefined()
+        # (current_state, path) = unvisited.pop()
+        (current_state, path, _) = unvisited.pop()
+        # priority -= 1
+        if problem.isGoalState(current_state) == True:
+            return path
+        elif current_state not in visited:
+            visited.add(current_state)
+            for (child, action, cost) in problem.getSuccessors(current_state):
+                if child not in visited:
+                    # unvisited.push((child, path + [action]))
+                    unvisited.push((child, path + [action], 1), priority)
+                    priority += 1
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
