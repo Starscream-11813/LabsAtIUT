@@ -345,7 +345,8 @@ def betterEvaluationFunction(currentGameState):
         return 1e9
     evalValue = 0
     capsuleDists = []
-    if len(currentGameState.getCapsules())
+    if len(currentGameState.getCapsules()):
+        # 
     # util.raiseNotDefined()
 
 # Abbreviation
