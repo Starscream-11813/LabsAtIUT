@@ -74,24 +74,7 @@ class ReflexAgent(Agent):
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
-        ghostScores = []
-        for ghostState in newGhostStates:
-            dist = manhattanDistance(newPos, ghostState.getPosition())
-            if ghostState.scaredTimer > dist: # killable
-                ghostScores.append(1e9)
-            elif dist <= 1: # ghost on adjacent cell
-                ghostScores.append(-1e9)
-            else:
-                ghostScores.append(0)
-        newFoodList = newFood.asList()
-        foodScores = []
-        for foodPos in newFoodList:
-            dist = manhattanDistance(newPos, foodPos)
-            foodScores.append(dist)
-        return successorGameState.getScore() + min(ghostScores) + 1.0/min(foodScores, default=1e9)
-    
-        # + (1.0/(1.0 + min(foodScores, default=1e9)))
-        # return successorGameState.getScore()
+        return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
     """
@@ -153,7 +136,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
         return self.value(gameState, 0, self.depth)[1]
-        # util.raiseNotDefined()
+
     def value(self, gameState, agentIndex, depth):
         if depth == 0 or gameState.isWin() or gameState.isLose():
             return self.evaluationFunction(gameState), Directions.STOP
@@ -206,56 +189,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        return self.value(gameState, 0, self.depth, -1e9, 1e9)[1]
-        # util.raiseNotDefined()
-        
-    def value(self, gameState, agentIndex, depth, alpha, beta):
-        if depth == 0 or gameState.isWin() or gameState.isLose():
-            return self.evaluationFunction(gameState), Directions.STOP
-        elif agentIndex == 0:
-            return self.maxValue(gameState, agentIndex, depth, alpha, beta)
-        else:
-            return self.minValue(gameState, agentIndex, depth, alpha, beta)
-
-    def minValue(self, gameState, agentIndex, depth, alpha, beta):
-        nextAgent = (agentIndex + 1) % gameState.getNumAgents()
-        if nextAgent == 0:
-            nextDepth = depth - 1
-        else:
-            nextDepth = depth
-        
-        selectedScore, selectedAction = 1e9, Directions.STOP
-        actionList = gameState.getLegalActions(agentIndex)
-        for action in actionList:
-            successorState = gameState.generateSuccessor(agentIndex, action)
-            successorScore = self.value(successorState, nextAgent, nextDepth, alpha, beta)[0]
-            if selectedScore > successorScore:
-                selectedScore = successorScore
-                selectedAction = action
-            if selectedScore < alpha:
-                return selectedScore, selectedAction
-            beta = min(beta, successorScore)
-        return selectedScore, selectedAction
-
-    def maxValue(self, gameState, agentIndex, depth, alpha, beta):
-        nextAgent = (agentIndex + 1) % gameState.getNumAgents()
-        if nextAgent == 0:
-            nextDepth = depth - 1
-        else:
-            nextDepth = depth
-        
-        selectedScore, selectedAction = -1e9, Directions.STOP
-        actionList = gameState.getLegalActions(agentIndex)
-        for action in actionList:
-            successorState = gameState.generateSuccessor(agentIndex, action)
-            successorScore = self.value(successorState, nextAgent, nextDepth, alpha, beta)[0]
-            if selectedScore < successorScore:
-                selectedScore = successorScore
-                selectedAction = action
-            if selectedScore > beta:
-                return selectedScore, selectedAction
-            alpha = max(alpha, successorScore)
-        return selectedScore, selectedAction
+        util.raiseNotDefined()
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
@@ -270,52 +204,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        return self.value(gameState, 0, self.depth)[1]
-        # util.raiseNotDefined()
-        
-    def value(self, gameState, agentIndex, depth):
-        if depth == 0 or gameState.isWin() or gameState.isLose():
-            return self.evaluationFunction(gameState), Directions.STOP
-        elif agentIndex == 0:
-            return self.maxValue(gameState, agentIndex, depth)
-        else:
-            return self.minValue(gameState, agentIndex, depth)
-    
-    def minValue(self, gameState, agentIndex, depth):
-        nextAgent = (agentIndex + 1) % gameState.getNumAgents()
-        if nextAgent == 0:
-            nextDepth = depth - 1
-        else:
-            nextDepth = depth
-        
-        selectedScore, selectedAction = 1e9, Directions.STOP
-        actionList = gameState.getLegalActions(agentIndex)
-        numLegalMoves = len(actionList)
-        v = 0
-        p = 1.0/float(numLegalMoves)
-        for action in actionList:
-            successorState = gameState.generateSuccessor(agentIndex, action)
-            successorScore = self.value(successorState, nextAgent, nextDepth)[0]
-            v +=  successorScore
-        v /= numLegalMoves
-        return v, selectedAction
-    
-    def maxValue(self, gameState, agentIndex, depth):
-        nextAgent = (agentIndex + 1) % gameState.getNumAgents()
-        if nextAgent == 0:
-            nextDepth = depth - 1
-        else:
-            nextDepth = depth
-        
-        selectedScore, selectedAction = -1e9, Directions.STOP
-        actionList = gameState.getLegalActions(agentIndex)
-        for action in actionList:
-            successorState = gameState.generateSuccessor(agentIndex, action)
-            successorScore = self.value(successorState, nextAgent, nextDepth)[0]
-            if selectedScore < successorScore:
-                selectedScore = successorScore
-                selectedAction = action
-        return selectedScore, selectedAction
+        util.raiseNotDefined()
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -325,28 +214,7 @@ def betterEvaluationFunction(currentGameState):
     DESCRIPTION: <write something here so we know what you did>
     """
     "*** YOUR CODE HERE ***"
-    newPos = currentGameState.getPacmanPosition()
-    newGhostStates = currentGameState.getGhostStates()
-    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
-    newFoodlist = currentGameState.getFood().asList()
-    ghostPoslist = [(ghost.getPosition()[0],ghost.getPosition()[1]) for ghost in newGhostStates]
-    ghostDists = []
-    for ghostState in newGhostStates:
-            dist = manhattanDistance(newPos, ghostState.getPosition())
-            ghostDists.append(dist)
-    # newFoodList = newFood.asList()
-    foodDists = []
-    for foodPos in newFoodlist:
-        dist = manhattanDistance(newPos, foodPos)
-        foodDists.append(dist)
-    if min(newScaredTimes) == 0 and (min(ghostDists) or currentGameState.isLose()):
-        return -1e9
-    if min(foodDists) == 0:
-        return 1e9
-    evalValue = 0
-    capsuleDists = []
-    if len(currentGameState.getCapsules())
-    # util.raiseNotDefined()
+    util.raiseNotDefined()
 
 # Abbreviation
 better = betterEvaluationFunction
