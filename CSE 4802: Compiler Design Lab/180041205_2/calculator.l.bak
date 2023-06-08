@@ -1,0 +1,31 @@
+%option noyywrap
+
+%{
+#include <stdio.h>
+#include <stdlib.h>
+#include "y.tab.h"
+int c;
+extern int yylval;
+/*
+    Syed Rifat Raiyan
+	180041205
+    IUT CSE-18
+*/
+%}
+%%
+" "       ;
+[a-z]     {
+            c = yytext[0];
+            yylval = c - 'a';
+            return(LETTER);
+          }
+[0-9]+     {
+            yylval = atoi(yytext);
+            return(NUMBER);
+          }
+[^a-z0-9\b]    {
+                 c = yytext[0];
+                 return(c);
+               }
+
+%%
